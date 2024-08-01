@@ -1,134 +1,175 @@
-# Predicting SpaceX Rocket Landings
+# SpaceX Rocket Landing Prediction
 
-This Jupyter Notebook is designed to predict whether SpaceX rockets will land successfully or not. A successful landing is indicated by `class = 1`, while a failed landing is indicated by `class = 0`.
+## Objective
+The goal of this project is to predict whether the rockets of SpaceX will land successfully or not. If the class is 0, it means the landing will fail; otherwise, if the class is 1, the landing will be successful.
 
-## Table of Contents
-1. [Loading and Inspecting the Data](#loading-and-inspecting-the-data)
-2. [Data Exploration](#data-exploration)
-3. [Data Manipulation](#data-manipulation)
-4. [Statistical Analysis](#statistical-analysis)
-5. [Visualizing Data](#visualizing-data)
-6. [Categorical Data Analysis](#categorical-data-analysis)
-7. [Conclusion](#conclusion)
+## Dataset
+The dataset used for this project is `dataset_falcon9.csv`. This dataset contains 90 rows and 18 columns.
 
-## Loading and Inspecting the Data
-First, we load the dataset and perform initial inspections to understand its structure and content.
-
+## Data Exploration
+### Import Libraries
 ```python
 import os
 import pandas as pd
 import numpy as np
+```
 
+### Load Dataset
+```python
 df = pd.read_csv('dataset_falcon9.csv')
 ```
 
-- Display the DataFrame:
-    ```python
-    df
-    ```
-- Get information about the DataFrame:
-    ```python
-    df.info()
-    ```
+### Display Dataset
+```python
+df.head()  # Display the first 5 rows
+df.tail(3)  # Display the last 3 rows
+```
 
-## Data Exploration
-- Preview the first and last few rows of the DataFrame:
-    ```python
-    df.head()
-    df.tail(3)
-    ```
+### Data Information
+```python
+df.info()
+```
+- The dataset has 90 rows and 18 columns.
+- There are no missing values except for the `LandingPad` column, which has 26 missing values.
 
-- View a specific column:
-    ```python
-    df['FlightNumber']
-    ```
+### Column Operations
+- Display a specific column:
+  ```python
+  df['FlightNumber']
+  ```
+- Drop a row:
+  ```python
+  df.drop(2, axis=0)  # Temporarily drop the second row
+  ```
+- Drop a column:
+  ```python
+  df.drop('Date', axis=1)  # Temporarily drop the 'Date' column
+  ```
+
+### Column Names and Shape
+```python
+df.columns  # Display column names
+df.shape  # Display dataset shape
+```
 
 ## Data Manipulation
-- Drop rows and columns:
-    ```python
-    df.drop(2, axis=0)  # Drop a row
-    df.drop('Date', axis=1)  # Drop a column temporarily
-    ```
+### Adding a Row
+```python
+new_row = {'FlightNumber': 11, 'Date': 2, 'BoosterVersion': 3, 'PayloadMass': 4, 'Orbit': 5,
+           'LaunchSite': 6, 'Outcome': 7, 'Flights': 8, 'GridFins': 9, 'Reused': 10, 'Legs': 11,
+           'LandingPad': 12, 'Block': 13, 'ReusedCount': 14, 'Serial': 15, 'Longitude': 16, 'Latitude': 17,
+           'Class': 18}
+df2 = pd.DataFrame(new_row, index=[0])
+df = pd.concat([df, df2], ignore_index=True)
+```
 
-- Get column names and DataFrame shape:
-    ```python
-    df.columns
-    df.shape
-    ```
+### Analyzing Specific Columns
+- Unique values in `BoosterVersion`:
+  ```python
+  set(df['BoosterVersion'])
+  ```
+- Min and max of `PayloadMass`:
+  ```python
+  df['PayloadMass'].min()
+  df['PayloadMass'].max()
+  ```
+- Mean and standard deviation of `PayloadMass`:
+  ```python
+  df['PayloadMass'].mean()
+  df['PayloadMass'].std()
+  ```
 
-- Add a new row to the DataFrame:
-    ```python
-    new_row = {'FlightNumber': 11, 'Date': 2, 'BoosterVersion': 3, 'PayloadMass': 4, 'Orbit': 5,
-               'LaunchSite': 6, 'Outcome': 7, 'Flights': 8, 'GridFins': 9, 'Reused': 10, 'Legs': 11,
-               'LandingPad': 12, 'Block': 13, 'ReusedCount': 14, 'Serial': 15, 'Longitude': 16, 'Latitude': 17,
-               'Class': 18}
-    df2 = pd.DataFrame(new_row, index=[0])
-    df2 = pd.concat([df, df2], ignore_index=True)
-    df2.tail()
-    ```
+### Descriptive Statistics
+```python
+df['PayloadMass'].describe()
+```
 
-## Statistical Analysis
-- Analyzing numerical columns:
-    ```python
-    df['PayloadMass'].min()
-    df['PayloadMass'].max()
-    df['PayloadMass'].mean()
-    df['PayloadMass'].std()
-    df['PayloadMass'].describe()
-    ```
+### Visualizing Data
+- Histogram:
+  ```python
+  df['PayloadMass'].hist()
+  ```
+- Plot:
+  ```python
+  df['PayloadMass'].plot()
+  ```
 
-## Visualizing Data
-- Plot histograms and other visualizations:
-    ```python
-    df['PayloadMass'].hist()
-    df['PayloadMass'].plot()
-    ```
+### Unique Values and Value Counts
+- Unique values in `Orbit`:
+  ```python
+  df['Orbit'].unique()
+  ```
+- Value counts:
+  ```python
+  df['Orbit'].value_counts()
+  ```
 
-- Analyzing categorical columns:
-    ```python
-    set(df['Orbit'])
-    df['Orbit'].unique()
-    df['Orbit'].value_counts()
-    df['Orbit'].hist()
-    ```
+### Success and Fail DataFrames
+```python
+Success_df = df[df['Class'] == 1]
+Fail_df = df[df['Class'] == 0]
+```
 
-## Categorical Data Analysis
-- Create DataFrames for successful and failed landings:
-    ```python
-    Success_df = df[df['Class'] == 1]
-    Fail_df = df[df['Class'] == 0]
-    Success_df.info()
-    Fail_df['Class'].head()
-    ```
+### Analyzing Specific Columns in New DataFrames
+```python
+Success_df.info()
+Fail_df['Class'].head()
+```
 
-- Explore categorical columns:
-    ```python
-    print('LaunchSite:', set(df['LaunchSite']))
-    print('Outcome:', set(df['Outcome']))
-    print('Flights:', set(df['Flights']))
-    
-    for i in range(len(df.columns)):
-        print(df.columns[i], ":")
-        print(set(df[df.columns[i]]))
-        print('---------')
-    ```
+## Data Cleaning
+- Drop unnecessary columns:
+  ```python
+  df = df.drop(['BoosterVersion', 'Serial', 'Longitude', 'Latitude'], axis=1)
+  df.info()  # Number of columns changed from 18 to 14
+  ```
 
-- Outcome analysis for successful and failed landings:
-    ```python
-    print('Success:\n', Success_df['Outcome'].value_counts())
-    print('-----------')
-    print('Fail:\n', Fail_df['Outcome'].value_counts())
-    ```
+## Data Visualization
+### Install Required Libraries
+```python
+!pip install matplotlib
+!pip install seaborn
+```
+```python
+import seaborn as sns
+import matplotlib.pyplot as plt
+```
 
-- Focus on categorical and boolean values:
-    ```python
-    print('------------LandingPad:\n', df['LandingPad'].value_counts())
-    print('------------Block:\n', df['Block'].value_counts())
-    print('------------ReusedCount:\n', df['ReusedCount'].value_counts())
-    print('------------GridFins:\n', df['GridFins'].value_counts())
-    print('------------Reused:\n', df['Reused'].value_counts())
-    print('------------Legs:\n', df['Legs'].value_counts())
-    ```
+### Visualize Relations
+- PayloadMass vs FlightNumber:
+  ```python
+  sns.catplot(y="PayloadMass", x="FlightNumber", data=df, aspect=5)
+  plt.xlabel("Flight Number", fontsize=20)
+  plt.ylabel("Payload Mass (kg)", fontsize=20)
+  plt.show()
+  ```
+- LaunchSite vs FlightNumber:
+  ```python
+  sns.catplot(y="LaunchSite", x="FlightNumber", hue="Class", data=df, aspect=5)
+  plt.xlabel("Flight Number", fontsize=20)
+  plt.ylabel("LaunchSite", fontsize=20)
+  plt.show()
+  ```
+- LaunchSite vs PayloadMass:
+  ```python
+  sns.catplot(x="LaunchSite", y="PayloadMass", hue="Class", data=df, aspect=5)
+  plt.xlabel("LaunchSite", fontsize=20)
+  plt.ylabel("Payload Mass (kg)", fontsize=20)
+  plt.show()
+  ```
+
+### Visualize Numerical and Categorical Data
+- Distribution of `PayloadMass`:
+  ```python
+  sns.displot(df['PayloadMass'])
+  ```
+- Countplot of `LaunchSite`:
+  ```python
+  sns.countplot(x="LaunchSite", data=df)
+  ```
+
+## Note
+- Use `sns.countplot` for categorical data.
+- Use `sns.displot` for numerical data.
 
 ## Conclusion
-This notebook provides a comprehensive analysis of SpaceX rocket landing data. By exploring and manipulating the data, we can gain insights into various factors that contribute to the success or failure of rocket landings. Further steps could include advanced modeling and predictive analysis to improve the accuracy of these predictions.
+This project involves exploring the SpaceX rocket launch dataset to predict the success of rocket landings. Data cleaning, manipulation, and visualization techniques were applied to understand and prepare the data for modeling.
